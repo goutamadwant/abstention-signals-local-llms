@@ -1,0 +1,48 @@
+{
+ "run_id": "verifier_gated-teleqna-s1-gemma-4-31b-it-qat",
+ "kind": "sensitivity",
+ "status": "ok",
+ "method": "verifier_gated",
+ "dataset": "teleqna",
+ "model": "gemma-4-31b-it-qat",
+ "seed": 1,
+ "evaluator_id": "e_teleqna",
+ "n": 1500,
+ "metric_values": {
+  "accuracy": 0.8007,
+  "aurc": 0.1128,
+  "coverage": 0.7933,
+  "declined_rate": 0.0013,
+  "extra_tokens_per_item": 86.5,
+  "format_failure_rate": 0.0,
+  "latency_s_per_item": 1.185,
+  "policy_latency_s_per_item": 0.514,
+  "selective_accuracy": 0.8395,
+  "selective_accuracy_at_0.7": 0.8543,
+  "selective_accuracy_at_0.8": 0.8358,
+  "selective_accuracy_at_0.9": 0.8259,
+  "tokens_per_item": 221.2
+ },
+ "outputs": [
+  "experiments/runs/verifier_gated-teleqna-s1-gemma-4-31b-it-qat/r3/attempt-1.log",
+  "experiments/runs/verifier_gated-teleqna-s1-gemma-4-31b-it-qat/r3/predictions.jsonl",
+  "experiments/runs/verifier_gated-teleqna-s1-gemma-4-31b-it-qat/r3/result.json"
+ ],
+ "runner_sha256": "5b1c418e0073a784a85e54d7bcf3f4f189d8060a833a6f4ff7aa9f8b4b139e04",
+ "config_sha256": "7fcc36c78b410e0d164ac66167724bc529873760d482d9e9460d2ca0c98321a6",
+ "artifact_sha256": "1f27b603e1643281ec63110d005ea8d3211919b30ea74a1aac2434c04469f040",
+ "started_at": "2026-10-04T05:39:06+00:00",
+ "finished_at": "2026-10-04T05:51:58+00:00",
+ "hardware": "<HOST>",
+ "attempts": [
+  {
+   "attempt": 1,
+   "exit_code": 0,
+   "seconds": 771.9
+  }
+ ],
+ "error": "",
+ "extra": {
+  "cache": "<REPO>/experiments/cache/firstpass-teleqna-v2-gemma-4-31b-it-qat-s1.jsonl"
+ }
+}

@@ -1,0 +1,48 @@
+{
+ "run_id": "self_consistency-teleqna-s3-llama-3.3-70b-instruct",
+ "kind": "full",
+ "status": "ok",
+ "method": "self_consistency",
+ "dataset": "teleqna",
+ "model": "llama-3.3-70b-instruct",
+ "seed": 3,
+ "evaluator_id": "e_teleqna",
+ "n": 1500,
+ "metric_values": {
+  "accuracy": 0.7767,
+  "aurc": 0.2017,
+  "coverage": 0.9813,
+  "declined_rate": 0.002,
+  "extra_tokens_per_item": 732.0,
+  "format_failure_rate": 0.0,
+  "latency_s_per_item": 2.689,
+  "policy_latency_s_per_item": 1.633,
+  "selective_accuracy": 0.7819,
+  "selective_accuracy_at_0.7": 0.7886,
+  "selective_accuracy_at_0.8": 0.7858,
+  "selective_accuracy_at_0.9": 0.7859,
+  "tokens_per_item": 878.4
+ },
+ "outputs": [
+  "experiments/runs/self_consistency-teleqna-s3-llama-3.3-70b-instruct/r2/attempt-1.log",
+  "experiments/runs/self_consistency-teleqna-s3-llama-3.3-70b-instruct/r2/predictions.jsonl",
+  "experiments/runs/self_consistency-teleqna-s3-llama-3.3-70b-instruct/r2/result.json"
+ ],
+ "runner_sha256": "5b1c418e0073a784a85e54d7bcf3f4f189d8060a833a6f4ff7aa9f8b4b139e04",
+ "config_sha256": "7fcc36c78b410e0d164ac66167724bc529873760d482d9e9460d2ca0c98321a6",
+ "artifact_sha256": "1f27b603e1643281ec63110d005ea8d3211919b30ea74a1aac2434c04469f040",
+ "started_at": "2026-10-03T22:24:45+00:00",
+ "finished_at": "2026-10-03T23:05:36+00:00",
+ "hardware": "<HOST>",
+ "attempts": [
+  {
+   "attempt": 1,
+   "exit_code": 0,
+   "seconds": 2451.0
+  }
+ ],
+ "error": "",
+ "extra": {
+  "cache": "<REPO>/experiments/cache/firstpass-teleqna-v2-llama-3.3-70b-instruct-s3.jsonl"
+ }
+}

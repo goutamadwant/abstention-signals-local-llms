@@ -1,0 +1,48 @@
+{
+ "run_id": "unguarded-teleqna_full-s1-qwen3-coder-30b-a3b-instruct",
+ "kind": "sensitivity",
+ "status": "ok",
+ "method": "unguarded",
+ "dataset": "teleqna_full",
+ "model": "qwen3-coder-30b-a3b-instruct",
+ "seed": 1,
+ "evaluator_id": "e_teleqna",
+ "n": 10000,
+ "metric_values": {
+  "accuracy": 0.7154,
+  "aurc": 0.2809,
+  "coverage": 0.9995,
+  "declined_rate": 0.0005,
+  "extra_tokens_per_item": 0.0,
+  "format_failure_rate": 0.0,
+  "latency_s_per_item": 0.118,
+  "policy_latency_s_per_item": 0.0,
+  "selective_accuracy": 0.7158,
+  "selective_accuracy_at_0.7": 0.7123,
+  "selective_accuracy_at_0.8": 0.7121,
+  "selective_accuracy_at_0.9": 0.7121,
+  "tokens_per_item": 121.6
+ },
+ "outputs": [
+  "experiments/runs/unguarded-teleqna_full-s1-qwen3-coder-30b-a3b-instruct/r4/attempt-1.log",
+  "experiments/runs/unguarded-teleqna_full-s1-qwen3-coder-30b-a3b-instruct/r4/predictions.jsonl",
+  "experiments/runs/unguarded-teleqna_full-s1-qwen3-coder-30b-a3b-instruct/r4/result.json"
+ ],
+ "runner_sha256": "5b1c418e0073a784a85e54d7bcf3f4f189d8060a833a6f4ff7aa9f8b4b139e04",
+ "config_sha256": "7fcc36c78b410e0d164ac66167724bc529873760d482d9e9460d2ca0c98321a6",
+ "artifact_sha256": "1f27b603e1643281ec63110d005ea8d3211919b30ea74a1aac2434c04469f040",
+ "started_at": "2026-10-04T03:42:35+00:00",
+ "finished_at": "2026-10-04T03:59:13+00:00",
+ "hardware": "<HOST>",
+ "attempts": [
+  {
+   "attempt": 1,
+   "exit_code": 0,
+   "seconds": 998.2
+  }
+ ],
+ "error": "",
+ "extra": {
+  "cache": "<REPO>/experiments/cache/firstpass-teleqna_full-v2-qwen3-coder-30b-a3b-instruct-s1.jsonl"
+ }
+}

@@ -1,0 +1,48 @@
+{
+ "run_id": "self_consistency_k1-teleqna-s1-qwen3-coder-30b-a3b-instruct",
+ "kind": "full",
+ "status": "ok",
+ "method": "self_consistency_k1",
+ "dataset": "teleqna",
+ "model": "qwen3-coder-30b-a3b-instruct",
+ "seed": 1,
+ "evaluator_id": "e_teleqna",
+ "n": 1500,
+ "metric_values": {
+  "accuracy": 0.7453,
+  "aurc": 0.2268,
+  "coverage": 0.9787,
+  "declined_rate": 0.0007,
+  "extra_tokens_per_item": 125.6,
+  "format_failure_rate": 0.0,
+  "latency_s_per_item": 0.231,
+  "policy_latency_s_per_item": 0.105,
+  "selective_accuracy": 0.7514,
+  "selective_accuracy_at_0.7": 0.7543,
+  "selective_accuracy_at_0.8": 0.7558,
+  "selective_accuracy_at_0.9": 0.7496,
+  "tokens_per_item": 251.2
+ },
+ "outputs": [
+  "experiments/runs/self_consistency_k1-teleqna-s1-qwen3-coder-30b-a3b-instruct/r5/attempt-1.log",
+  "experiments/runs/self_consistency_k1-teleqna-s1-qwen3-coder-30b-a3b-instruct/r5/predictions.jsonl",
+  "experiments/runs/self_consistency_k1-teleqna-s1-qwen3-coder-30b-a3b-instruct/r5/result.json"
+ ],
+ "runner_sha256": "5b1c418e0073a784a85e54d7bcf3f4f189d8060a833a6f4ff7aa9f8b4b139e04",
+ "config_sha256": "7fcc36c78b410e0d164ac66167724bc529873760d482d9e9460d2ca0c98321a6",
+ "artifact_sha256": "1f27b603e1643281ec63110d005ea8d3211919b30ea74a1aac2434c04469f040",
+ "started_at": "2026-10-03T15:57:59+00:00",
+ "finished_at": "2026-10-03T16:00:37+00:00",
+ "hardware": "<HOST>",
+ "attempts": [
+  {
+   "attempt": 1,
+   "exit_code": 0,
+   "seconds": 158.7
+  }
+ ],
+ "error": "",
+ "extra": {
+  "cache": "<REPO>/experiments/cache/firstpass-teleqna-v2-qwen3-coder-30b-a3b-instruct-s1.jsonl"
+ }
+}

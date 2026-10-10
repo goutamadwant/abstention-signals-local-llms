@@ -1,0 +1,759 @@
+title: Free Signals or Self-Verification? A Cost-Accounted Case Study of LLM Abstention for Telecom QA and Network Configuration
+  on One Local Serving Stack
+research_questions:
+- 'RQ1: At matched coverage, which abstention policy yields the lowest selective risk (and AURC) for 7B-70B open models on
+  TeleQnA?'
+- 'RQ2: Does the policy ordering transfer from telecom QA (TeleQnA) to network-configuration specification translation (NetConfEval
+  task 1)?'
+- 'RQ3: What token and latency cost does each policy add on commodity hardware (Mac Studio, LM Studio)?'
+hypotheses:
+- id: H1
+  statement: 'Two-sided, primary, per model on TeleQnA: the rows of all three seeds are pooled (each row = one question under
+    one seed; every policy scores the same first-pass answer of that row, so rows are paired across policies); the analysis
+    unit for inference is the ORIGINAL QUESTION as a cluster carrying all its seed rows (clustered bootstrap, statistics.primary_rule);
+    tie-aware AURC of the verifier signal differs from the best free signal (the one of max-logprob/margin with the lower
+    pooled AURC); 10,000 resamples, Holm across the 6 policy-vs-verifier comparisons per model, and the per-seed AURC differences
+    must agree in sign; the clean pilot points to the free signals being better'
+  primary_metric: aurc
+- id: H2
+  statement: 'Exploratory: per-model policy ordering by AURC on NetConfEval task 1 (sequence-level signals) agrees with the
+    TeleQnA ordering (Kendall tau with bootstrap CI over batches)'
+  primary_metric: aurc
+- id: H3
+  statement: 'Per-policy report (not a pass/fail claim): at coverage 0.8, the selective-accuracy gain of each gated policy
+    over the unguarded floor per model, in points with a paired bootstrap CI; the 3-point line pre-registered in earlier rounds
+    is reported as a reference (the pilot already shows the cost-matched k=1 control at +2.25 points, i.e. below it)'
+  primary_metric: selective_accuracy_at_0.8
+- id: H4
+  statement: The cost-matched k=1 self-consistency control does not match the verifier's AURC (otherwise the verifier's advantage
+    is just the extra pass)
+  primary_metric: aurc
+datasets:
+- id: teleqna
+  name: TeleQnA stratified 1,500-question subset (300 per category, fixed sampling frame seed 1000)
+  source: https://github.com/netop-team/TeleQnA
+  license: MIT
+  split: fixed 1,500 of 10,000 (stratified by category)
+  size: 1500
+  ground_truth_id: teleqna
+- id: netconfeval_t1
+  name: 'NetConfEval task 1 formal specification translation, ALL THREE policy types (reachability, waypoint, load-balancing:
+    the official script''s hardest step-1 setting), batch sizes 1/2/5/10'
+  source: https://github.com/RedHatResearch/conext24-NetConfEval
+  license: MIT
+  split: all 450 batches from the official sampler (25 iterations x batch sizes 1/2/5/10)
+  size: 450
+  ground_truth_id: netconfeval
+  policy_types:
+  - reachability
+  - waypoint
+  - loadbalancing
+  redefinition_note: 'pre-freeze finding from the registered reachability-only smoke cells (all 450 batches, kind smoke):
+    30B 99.8% and 70B 100% correct, i.e. no errors to abstain on, and the 7B at 6% with 80% format failures. Reachability-only
+    is therefore at ceiling for the two larger models; the dataset was redefined to the three-policy setting BEFORE freeze
+    and the paper states this. Three-policy registered smoke (18 batches): see format_rule'
+- id: teleqna_full
+  name: TeleQnA, every question with a parsable gold option (subset-robustness cell only; not part of the 123-cell matrix)
+  source: https://github.com/netop-team/TeleQnA
+  license: MIT
+  split: all
+  size: 10000
+  ground_truth_id: teleqna
+  role: sensitivity
+baselines:
+- id: unguarded
+  name: unguarded first-pass answer (coverage 1.0)
+  implementation: artifact/run_cell.py --method unguarded
+  published_result:
+    metric: accuracy
+    value: 0.67
+    source: https://doi.org/10.1109/mnet.2025.3576035
+  tolerance: 0.3
+- id: logprob_gate
+  name: max-logprob (answer token on TeleQnA; mean token probability of the JSON on NetConfEval)
+  implementation: artifact/run_cell.py --method logprob_gate
+- id: margin_gate
+  name: margin (top-1 minus top-2 on TeleQnA; minimum token probability of the JSON on NetConfEval)
+  implementation: artifact/run_cell.py --method margin_gate
+- id: self_consistency
+  name: self-consistency agreement, k=5, label-free (same option id / identical parsed reachability map)
+  implementation: artifact/run_cell.py --method self_consistency
+- id: self_consistency_k1
+  name: 'self-consistency agreement, k=1 (cost-matched control: one extra pass); label-free'
+  implementation: artifact/run_cell.py --method self_consistency_k1
+- id: confidence_gate
+  name: verbalized confidence on the first-pass answer
+  implementation: artifact/run_cell.py --method confidence_gate
+method:
+  id: verifier_gated
+  name: P(True)-style verifier gate (Kadavath et al. 2022); score = sigmoid(log P(YES) - log P(NO)) from the verifier's top-20
+    alternatives with tokenization variants aggregated; zero-shot strict wording is primary
+  description: artifact/run_cell.py --method verifier_gated
+models_or_configs:
+- id: qwen2.5-coder-7b-instruct
+  params_b: 7
+- id: qwen3-coder-30b-a3b-instruct
+  params_b: 30
+- id: llama-3.3-70b-instruct
+  params_b: 70
+seeds:
+- 1
+- 2
+- 3
+metrics:
+- id: aurc
+  name: area under the risk-coverage curve over the continuous score (lower is better)
+  evaluator_id: e_teleqna
+  direction: lower
+  evaluator_by_dataset:
+    teleqna: e_teleqna
+    netconfeval_t1: e_netconfeval
+  binding_note: one predicate per dataset for every policy and metric; run records carry the evaluator id of their dataset
+- id: selective_accuracy_at_0.8
+  name: accuracy of the top-80% items by score
+  evaluator_id: e_teleqna
+  direction: higher
+  evaluator_by_dataset:
+    teleqna: e_teleqna
+    netconfeval_t1: e_netconfeval
+  binding_note: one predicate per dataset for every policy and metric; run records carry the evaluator id of their dataset
+- id: selective_accuracy
+  name: accuracy over items above the policy's operating threshold
+  evaluator_id: e_teleqna
+  direction: higher
+  evaluator_by_dataset:
+    teleqna: e_teleqna
+    netconfeval_t1: e_netconfeval
+  binding_note: one predicate per dataset for every policy and metric; run records carry the evaluator id of their dataset
+- id: coverage
+  name: fraction answered at the operating threshold
+  evaluator_id: e_teleqna
+  direction: higher
+  evaluator_by_dataset:
+    teleqna: e_teleqna
+    netconfeval_t1: e_netconfeval
+  binding_note: one predicate per dataset for every policy and metric; run records carry the evaluator id of their dataset
+- id: accuracy
+  name: first-pass accuracy over all items
+  evaluator_id: e_teleqna
+  direction: higher
+  evaluator_by_dataset:
+    teleqna: e_teleqna
+    netconfeval_t1: e_netconfeval
+  binding_note: one predicate per dataset for every policy and metric; run records carry the evaluator id of their dataset
+- id: tokens_per_item
+  name: first-pass plus policy tokens per item
+  evaluator_id: e_cost
+  direction: lower
+- id: latency_s_per_item
+  name: wall-clock seconds per item
+  evaluator_id: e_cost
+  direction: lower
+- id: format_failure_rate
+  name: fraction of first-pass outputs the official checker cannot parse (counted as wrong)
+  evaluator_id: e_teleqna
+  direction: lower
+  evaluator_by_dataset:
+    teleqna: e_teleqna
+    netconfeval_t1: e_netconfeval
+  binding_note: one predicate per dataset for every policy and metric; run records carry the evaluator id of their dataset
+evaluators:
+- id: e_teleqna
+  name: 'TeleQnA exact match on option id: a re-implementation of the official evaluation_tools.py semantics (the official
+    script compares the full ''option N: text'' string; we compare N and audit the equivalence on every reported first-pass
+    reply with an independent parser, environment/audit_scorer_v2.py; artifact/audit_scorer.py is the older sampled audit)'
+  source: https://github.com/netop-team/TeleQnA/blob/main/evaluation_tools.py
+  official: false
+  audit: 'environment/scorer_audit_v2.json (reported execution, all 23,500 rows: 4 disagreements, 0.017%; 2 parse false credits
+    on a decimal reply, 2 benchmark typos where the id-based scorer is right); experiments/scorer_audit.json (0/500, pre-execution
+    pool, history)'
+- id: e_netconfeval
+  name: 'official NetConfEval compare_result imported from the benchmark repository, applied per requirement batch (strict:
+    correct iff nothing missing and nothing wrong; format failures count as wrong)'
+  source: https://github.com/RedHatResearch/conext24-NetConfEval
+  official: true
+- id: e_cost
+  name: LM Studio usage counters and wall clock
+  source: https://lmstudio.ai/docs
+  official: false
+statistics:
+  paired_test: paired bootstrap (10,000 resamples over items) on AURC and selective-accuracy differences; McNemar on per-item
+    correctness at matched coverage 0.8
+  ci_method: paired bootstrap percentile 95% CI over items, per model and seed, then pooled across seeds
+  effect_size: AURC difference and selective-accuracy difference in points with CI; odds ratio for McNemar; Kendall tau for
+    ordering transfer
+  correction: Holm across the 6 policy-vs-verifier comparisons within each model
+  alpha: 0.05
+  power_note: 1,500 paired TeleQnA items give > 0.9 power for a 3-point selective-accuracy difference at alpha 0.05; 450 NetConfEval
+    batches give > 0.8 power for 6 points (H2 is exploratory)
+  calibration: ECE (15 bins) and Brier computed on ALL items per policy score, never on the answered subset
+  tie_handling: 'AURC and selective accuracy at matched coverage are tie-aware (expected rank under uniform random tie order)
+    with ties defined by exact float equality (pre-registered). Disclosed: the per-policy saturation share (scores within
+    1e-6 of 0 or 1) is reported; near-saturated scores that differ below 1e-6 are ranked by those differences and the paper
+    says so'
+  primary_rule: 'per (dataset, model): items pooled over seeds; CLUSTERED bootstrap over items (each drawn item brings all
+    its seed rows) on tie-aware AURC, verifier vs best free signal, 10,000 resamples, Holm over the six policy comparisons,
+    alpha 0.05; a difference counts as a result only if the per-seed AURC differences agree in sign on all three seeds (seed-level
+    robustness); the i.i.d. per-seed bootstraps are reported as secondary'
+  assumptions:
+    paired_unit: the item (TeleQnA question; NetConfEval requirement batch). Every policy scores the same cached first-pass
+      answer, so per-item outcomes are paired across policies by construction
+    seed_pooling: seeds change the first-pass sample, not the item; the primary pooled test therefore resamples ITEMS as clusters
+      with all their seed rows (clustered bootstrap), which is valid under exchangeable items and arbitrary within-item dependence;
+      seed-level sign agreement is required in addition
+    bootstrap: percentile 95% CIs from 10,000 item resamples (1,000 for Kendall tau); two-sided p as twice the smaller tail;
+      no normality assumption; the CI ignores uncertainty in the fixed 1,500-item sampling frame
+    mcnemar: exact binomial test on discordant pairs of per-item 'answered and correct' at matched coverage 0.8 (answered
+      set = top 80% by score with ties broken by item id); reported as a secondary test next to the bootstrap
+    ties_and_saturation: AURC and Sel@c are tie-aware with exact-equality ties; the per-policy saturation share counts scores
+      within 1e-6 of 0 or 1 and is a disclosure (max-logprob and the agreement scores saturate; the verifier's scores cluster
+      within 1e-6 of 1 on a share of items and are ranked by sub-1e-6 differences); McNemar's answered set uses the deterministic
+      id tie-break
+    holm: 'primary family: the six policy-vs-verifier comparisons of the pooled clustered bootstrap per (dataset, model);
+      the per-seed families are corrected the same way and reported as secondary; sensitivity cells are reported uncorrected
+      and marked as such'
+    h2_exclusions: 'Kendall tau is computed over the policies present on BOTH datasets for that model: 5 policies for the
+      70B (no k=5 on NetConfEval) and 6 for the others; unguarded (constant score) is excluded; a model whose NetConfEval
+      format/structure-failure rate exceeds 50% is excluded from H2 and the exclusion is stated (declines do not count toward
+      the rule)'
+  analysis_unit: the original question (TeleQnA) or requirement batch (NetConfEval) is the cluster and resampling unit; seed
+    rows of the same question travel together; policies are paired within a row
+matrix:
+  cells_expected: 123
+  exclusions:
+  - method: self_consistency
+    dataset: netconfeval_t1
+    model: llama-3.3-70b-instruct
+    reason: 'pre-registered compute reduction: k=5 self-consistency on 450 NetConfEval batches with the 70B model (about 600
+      output tokens per sample) does not fit the 60-hour Studio budget; the 70B NetConfEval row therefore has 5 baselines
+      + method and is marked in the paper'
+  policies_pre_registered:
+  - unguarded
+  - logprob_gate
+  - margin_gate
+  - self_consistency
+  - self_consistency_k1
+  - confidence_gate
+  - verifier_gated
+  sensitivity_policies:
+  - verifier_gated_pB
+  - verifier_gated_fs
+  control_policies:
+  - verifier_wrong_control
+  order: model-major (one weight swap per model on LM Studio)
+headroom:
+  metric_id: selective_accuracy_at_0.8
+  pilot_threshold: 0.03
+  pilot_scope:
+    datasets:
+    - teleqna
+    seeds:
+    - 1
+    models:
+    - qwen3-coder-30b-a3b-instruct
+    baseline_methods:
+    - unguarded
+    - logprob_gate
+    - margin_gate
+    - self_consistency_k1
+    - confidence_gate
+  note: pilot compares verifier_gated to the BEST baseline in scope (free signals included) at 0.8 coverage on the shared
+    first-pass answers
+kill_criteria:
+- 'pilot (30B, TeleQnA, seed 1): verifier P(YES) does not exceed the best free signal (max-logprob or margin) by >= 3 selective-accuracy
+  points at 0.8 coverage (then the paper is the negative-result fallback or is killed if even the free signals add < 3 points
+  over the floor)'
+- 'the shared-answer scorer disagrees with evaluation_tools.py semantics on a 500-item raw-text audit (> 0.5%) [audited: 0/500,
+  independent parser, 15 non-bare-digit outputs; v2 audit of the reported execution 4/23,500 = 0.017%, below threshold]'
+- 'NetConfEval task 1 cannot complete the 450-batch frame for the three models within 40 Studio hours (70B k=5 cells excluded
+  by pre-registration): fall back to the pre-registered 180-batch frame (fallback_scope.step_1); if that also fails, KILL
+  or re-target (fallback_scope.step_2), never a 1-dataset paper against the 2-dataset bar'
+positive_fallback: 'If H1 fails: a negative result with full risk-coverage curves and costs showing that free signals (logprob/margin)
+  match the paid verification pass on telecom QA, plus the operator recommendation; still above the bar.'
+compute:
+  where: Mac Studio M3 Ultra 96 GB via LM Studio (worker); models JIT-loaded one at a time (lms unload --all between models)
+  budget_hours: 60
+  paid_api_usd: 0
+  measured_rates:
+    teleqna_first_pass_s_per_item:
+      qwen3-coder-30b: 0.126
+    teleqna_verifier_extra_s_per_item:
+      qwen3-coder-30b: 0.22
+    netconfeval_first_pass_s_per_batch_size1:
+      qwen2.5-coder-7b: 0.79
+      qwen3-coder-30b: 0.86
+      llama-3.3-70b: 3.57
+    netconfeval_verifier_extra_s_per_batch:
+      qwen2.5-coder-7b: 0.2
+      qwen3-coder-30b: 0.2
+      llama-3.3-70b: 1.1
+    source: clean pilot (TeleQnA, 1,500 items), registered reachability-only smoke cells (450 batches) and the registered
+      three-policy smoke cells (18 batches) on the Studio; rates below the 1 s level are from the registered runs
+    netconfeval_three_policy_first_pass_s_per_batch:
+      qwen2.5-coder-7b: 0.91
+      qwen3-coder-30b: 1.21
+      llama-3.3-70b: 6.37
+      source: registered smoke cells (18 batches, current runner), result.json latency_s_per_item
+    netconfeval_three_policy_tokens_per_batch:
+      qwen2.5-coder-7b: 889.1
+      qwen3-coder-30b: 908.1
+      llama-3.3-70b: 909.4
+      source: registered smoke cells (18 batches), result.json tokens_per_item
+    netconfeval_three_policy_extra_s_per_batch:
+      verifier:
+        qwen2.5-coder-7b: 0.32
+        qwen3-coder-30b: 0.26
+        llama-3.3-70b: 2.64
+      self_consistency_k1:
+        qwen2.5-coder-7b: 0.755
+        qwen3-coder-30b: 1.214
+        llama-3.3-70b: 6.319
+      source: registered smoke cells under the frozen runner
+  plan_hours:
+    teleqna_7b_3_seeds: 1.5
+    teleqna_30b_3_seeds: 3.0
+    teleqna_70b_3_seeds: 12.0
+    netconfeval_7b_3_seeds: 3.0
+    netconfeval_30b_3_seeds: 3.5
+    netconfeval_70b_3_seeds_no_k5: 7.0
+    sensitivity_groups: 5.5
+    smoke: 1.5
+    total_planned: 37.0
+    headroom_vs_budget: 23.0
+    basis: 450 batches x per-batch seconds x (first pass + 5 self-consistency samples + k=1 + verifier + confidence), k=5
+      dropped for the 70B
+    v2_rerun:
+      matrix: 19.0
+      sensitivity_groups: 3.0
+      smoke: 0.7
+      basis: 'measured v1 execution: 66,381 s for 117 cells plus 7,310 s for the sensitivity groups; budget 60 h, about 26
+        h consumed by v1'
+execution:
+  command: PAPER_LMSTUDIO_HOST=${PAPER_LMSTUDIO_HOST:-http://127.0.0.1:1234} PAPER_LIMIT=${PAPER_LIMIT:-1500} PAPER_NCE_LIMIT=${PAPER_NCE_LIMIT:-450}
+    PAPER_NCE_POLICIES=reachability,waypoint,loadbalancing python3 run_cell.py --method {method} --dataset {dataset} --seed
+    {seed} --model {model} --out {out_dir}
+  workdir: artifact
+  nce_generation_cap: 'max_tokens 2048 per NetConfEval generation (official harness: 4096); the canonical parsed specification
+    with all three policy keys (spec_key) is what the verifier, confidence and self-consistency signals use; raw text is cached
+    up to 8,000 characters and falls back in when parsing fails'
+  env_note: PAPER_LIMIT / PAPER_NCE_LIMIT are shell defaults so pre-registered smoke cells (smoke_cells.env) can shrink them;
+    the policy types are fixed in the command
+reproduction_tolerance: 0.3
+design_notes:
+- all policies score the SAME cached first-pass answer per (dataset, model, seed, item); policies differ only in signal and
+  cost
+- every policy has a continuous score, so AURC and matched-coverage points are comparable
+- a 500-item audit compares our TeleQnA scorer with evaluation_tools.py semantics before baselines
+- per-category (5 TeleQnA categories; 4 NetConfEval batch sizes) tables are generated for every metric
+- verifier score is sigmoid(log P(YES) - log P(NO)) from top-20 alternatives; when NO is absent from the list its probability
+  is bounded by the smallest listed alternative; raw P(YES)/P(NO) and whether NO was listed are stored per item
+- 'wrong-answer control: the deliberately wrong option is never the gold and never the model''s own first-pass prediction
+  (the first pilot had 101 overlapping items; those are excluded by construction in the re-run)'
+- analysis restricts baselines, Holm and the H2 transfer statistic to the seven pre-registered policies; sensitivity and control
+  cells are reported separately
+- the official NetConfEval system prompt is a LangChain template; the runner renders '{{'/'}}' to single braces exactly as
+  ChatPromptTemplate does (sending the raw template made the 70B copy the doubled braces on 12/12 smoke batches)
+- 'every request sets reasoning_effort=none (thinking disabled): gemma-4 otherwise answers in a hidden reasoning channel and
+  returns empty content; all models are run without chain-of-thought, which the paper states'
+- the canonical specification (spec_key) is recomputed from the cached raw text whenever a first-pass record is loaded, so
+  cached answers from an earlier runner can never carry a stale key into the signals
+controls:
+- cost table per policy in tokens and seconds per item on the Mac Studio, with the k=1 control on the same row as the verifier
+- 'verifier elicitation sensitivity: neutral wording (verifier_gated_pB) and few-shot elicitation with three fixed out-of-frame
+  exemplars (verifier_gated_fs), both on the pilot model; AURC reported for all three verifier variants so the negative result
+  cannot be a zero-shot strawman'
+- 'wrong-answer control: the verifier scores a deliberately wrong option (never gold, never the model''s own prediction) for
+  every item (verifier_wrong_control); we report the AUROC of the verifier score for right vs wrong answers, i.e. whether
+  the verifier detects errors rather than rating item difficulty'
+- 'trained calibrator (post-hoc CONTROL, not a pre-registered baseline and not a matrix row): a logistic combination of logprob,
+  margin and the verifier score evaluated by item-level 5-fold cross-validation (folds by question id, every seed row of an
+  id in one fold, out-of-fold scores pooled); it is computed by analyze.py from the existing cells, reported next to the single
+  signals as the ''combined/trained'' row, uncorrected, and never enters H1, Holm or the evidence-bar baseline count. Why
+  a control and not a baseline: it needs labelled items to fit (gold answers), so it is not a label-free, deployable abstention
+  policy like the seven pre-registered ones; it bounds what a supervised combination of the same signals could reach and is
+  reported so that a reader can see whether the verifier adds information beyond the free signals'
+- 'independent verifier model: sensitivity group B (verifier_gated_x)'
+- 'dense non-code robustness model: sensitivity group C (gemma-4-31b-it-qat, seed 1, all pre-registered policies; not counted
+  toward the 3-model bar)'
+sensitivity_cells:
+- id: A_verifier_elicitation_and_controls
+  methods:
+  - verifier_gated_pB
+  - verifier_gated_fs
+  - verifier_wrong_control
+  scope:
+    datasets:
+    - teleqna
+    seeds:
+    - 1
+    models:
+    - qwen3-coder-30b-a3b-instruct
+  purpose: verifier wording/few-shot sensitivity and the wrong-answer error-detection control
+- id: B_independent_verifier_model
+  methods:
+  - verifier_gated_x
+  scope:
+    datasets:
+    - teleqna
+    seeds:
+    - 1
+    models:
+    - qwen2.5-coder-7b-instruct
+    - qwen3-coder-30b-a3b-instruct
+    - llama-3.3-70b-instruct
+  purpose: 'alternative explanation ''self-verification fails only because the verifier is the answerer'': the 30B verifies
+    the 7B and 70B answers, the 70B verifies the 30B answers (artifact/run_cell.py XMODEL); same cached first-pass answers,
+    same score'
+  requires_full: true
+  ordering: runs only after the full matrix so the cross-model verifier scores the cached first-pass answers (otherwise the
+    server would swap models per item)
+- id: C_dense_non_code_model
+  methods:
+  - unguarded
+  - logprob_gate
+  - margin_gate
+  - self_consistency
+  - self_consistency_k1
+  - confidence_gate
+  - verifier_gated
+  scope:
+    datasets:
+    - teleqna
+    seeds:
+    - 1
+    models:
+    - gemma-4-31b-it-qat
+  purpose: 'alternative explanation ''free signals win because code-tuned MoE models emit near-one-hot answer distributions'':
+    one dense, non-code instruction model (available on the Studio) under all pre-registered policies'
+- id: D_subset_robustness_full_teleqna
+  methods:
+  - unguarded
+  - logprob_gate
+  - margin_gate
+  - verifier_gated
+  scope:
+    datasets:
+    - teleqna_full
+    seeds:
+    - 1
+    models:
+    - qwen3-coder-30b-a3b-instruct
+  purpose: 'sampling-frame robustness: the primary 1,500-item stratified frame is compared with ALL TeleQnA questions with
+    a parsable gold option (about 10,000) on the pilot model; the paper reports both AURC orderings and the per-category breakdown
+    so the result cannot be attributed to the frame'
+pilot_evidence:
+  run: re-executed with the frozen runner (runner_sha256 1f64168cab1f) on 2026-09-27; pre-freeze runs remain in the registry
+    as history
+  model: qwen3-coder-30b-a3b-instruct
+  items: 1500
+  results:
+    unguarded:
+      accuracy: 0.74
+      aurc: 0.2451
+      coverage: 0.9993
+      declined_rate: 0.0007
+      extra_tokens_per_item: 0.0
+      format_failure_rate: 0.0
+      latency_s_per_item: 0.126
+      selective_accuracy: 0.7405
+      selective_accuracy_at_0.7: 0.741
+      selective_accuracy_at_0.8: 0.745
+      selective_accuracy_at_0.9: 0.7378
+      tokens_per_item: 125.6
+    verifier_gated:
+      accuracy: 0.74
+      aurc: 0.1716
+      coverage: 0.5993
+      declined_rate: 0.0007
+      extra_tokens_per_item: 80.6
+      format_failure_rate: 0.0
+      latency_s_per_item: 0.227
+      selective_accuracy: 0.8031
+      selective_accuracy_at_0.7: 0.7924
+      selective_accuracy_at_0.8: 0.7817
+      selective_accuracy_at_0.9: 0.763
+      tokens_per_item: 206.2
+    logprob_gate:
+      accuracy: 0.74
+      aurc: 0.1068
+      coverage: 0.93
+      declined_rate: 0.0007
+      extra_tokens_per_item: 0.0
+      format_failure_rate: 0.0
+      latency_s_per_item: 0.126
+      selective_accuracy: 0.7685
+      selective_accuracy_at_0.7: 0.8571
+      selective_accuracy_at_0.8: 0.8192
+      selective_accuracy_at_0.9: 0.7822
+      tokens_per_item: 125.6
+    margin_gate:
+      accuracy: 0.74
+      aurc: 0.0965
+      coverage: 0.9813
+      declined_rate: 0.0007
+      extra_tokens_per_item: 0.0
+      format_failure_rate: 0.0
+      latency_s_per_item: 0.126
+      selective_accuracy: 0.7473
+      selective_accuracy_at_0.7: 0.8552
+      selective_accuracy_at_0.8: 0.8183
+      selective_accuracy_at_0.9: 0.7815
+      tokens_per_item: 125.6
+    self_consistency_k1:
+      accuracy: 0.74
+      aurc: 0.2195
+      coverage: 0.9407
+      declined_rate: 0.0007
+      extra_tokens_per_item: 125.9
+      format_failure_rate: 0.0
+      latency_s_per_item: 0.246
+      selective_accuracy: 0.7626
+      selective_accuracy_at_0.7: 0.7657
+      selective_accuracy_at_0.8: 0.7675
+      selective_accuracy_at_0.9: 0.7615
+      tokens_per_item: 251.5
+    confidence_gate:
+      accuracy: 0.74
+      aurc: 0.1736
+      coverage: 0.8493
+      declined_rate: 0.0007
+      extra_tokens_per_item: 93.6
+      format_failure_rate: 0.0
+      latency_s_per_item: 0.242
+      selective_accuracy: 0.7716
+      selective_accuracy_at_0.7: 0.781
+      selective_accuracy_at_0.8: 0.7767
+      selective_accuracy_at_0.9: 0.7556
+      tokens_per_item: 219.2
+    verifier_gated_pB:
+      accuracy: 0.74
+      aurc: 0.1701
+      coverage: 0.6267
+      declined_rate: 0.0007
+      extra_tokens_per_item: 72.5
+      format_failure_rate: 0.0
+      latency_s_per_item: 0.225
+      selective_accuracy: 0.8011
+      selective_accuracy_at_0.7: 0.7905
+      selective_accuracy_at_0.8: 0.7825
+      selective_accuracy_at_0.9: 0.7615
+      tokens_per_item: 198.2
+    verifier_gated_fs:
+      accuracy: 0.74
+      aurc: 0.1621
+      coverage: 0.8633
+      declined_rate: 0.0007
+      extra_tokens_per_item: 240.5
+      format_failure_rate: 0.0
+      latency_s_per_item: 0.228
+      selective_accuracy: 0.7722
+      selective_accuracy_at_0.7: 0.8133
+      selective_accuracy_at_0.8: 0.795
+      selective_accuracy_at_0.9: 0.7615
+      tokens_per_item: 366.2
+    verifier_wrong_control:
+      accuracy: 0.74
+      aurc: 0.2836
+      coverage: 0.1053
+      declined_rate: 0.0007
+      extra_tokens_per_item: 79.4
+      format_failure_rate: 0.0
+      latency_s_per_item: 0.225
+      selective_accuracy: 0.7468
+      selective_accuracy_at_0.7: 0.6971
+      selective_accuracy_at_0.8: 0.7092
+      selective_accuracy_at_0.9: 0.7237
+      tokens_per_item: 205.1
+  decision: FALLBACK
+  headroom_vs_best_baseline: -0.0375
+  scorer_audit: 0/500 disagreements (independent raw-text parser)
+scope_statement: The paper compares abstention signals for a fixed local answerer at matched coverage and cost; it does not
+  claim an operational best practice for telecom QA. Retrieval augmentation (e.g. Telco-RAG) and domain-trained telecom LLMs
+  change the answerer, not the abstention signal, and every policy studied here can be layered on any answerer; they are out
+  of scope. No RAG or domain-tuned baseline is run.
+smoke_cells:
+  methods:
+  - unguarded
+  - verifier_gated
+  - logprob_gate
+  - self_consistency_k1
+  scope:
+    datasets:
+    - teleqna
+    - netconfeval_t1
+    seeds:
+    - 1
+    - 2
+    - 3
+    models:
+    - qwen2.5-coder-7b-instruct
+    - qwen3-coder-30b-a3b-instruct
+    - llama-3.3-70b-instruct
+  env:
+    PAPER_NCE_LIMIT: '18'
+    PAPER_LIMIT: '60'
+  purpose: 'v2 smoke: 60 TeleQnA items and 18 NetConfEval batches per model under every seed; backs the seed-independence
+    check before the full run; run ids are prefixed smoke- and never enter the analysis'
+  history_note: 'the first smoke execution ran the full 450 reachability-only batches because the command hard-coded PAPER_NCE_LIMIT;
+    those runs stay in the registry (kind smoke) and motivated the dataset redefinition; the second execution (18 batches)
+    was served reachability-only answers from the first-pass cache because the cache key ignored the policy types (fixed in
+    the runner: cache key carries the policy set); both stay in the registry as smoke history'
+analysis_script_sha256: 52149e4e07bd54e39d2b32f64eda2ac2e3cc91798f58485dbb27fea5237fd9be
+amendments:
+- date: '2026-09-27'
+  change: analysis script revised before any matrix result was read; execution, runner, matrix, hypotheses and statistics
+    rules unchanged
+- date: '2026-09-28'
+  change: declined rate reported per cell
+- date: '2026-09-28'
+  change: 'seed 3 replaced by 42 after a server sampling defect was diagnosed (see v1_history); reporting additions: H3 gain-over-floor
+    table with clustered intervals, saturation and own-answer AUROC columns, seed-agreement table; model pins recorded'
+- date: '2026-10-03'
+  change: runner sampling repair (per-item request seeds, versioned first-pass caches, stored samples, per-policy latency)
+    and full re-execution of the matrix and sensitivity cells; seeds restored to the pre-registered [1, 2, 3]; post hoc reporting
+    additions (decline sensitivity with an error-abstain floor, tie-resolution sensitivity, extra latency, NetConfEval correctness-rule,
+    item-type and batch-size sensitivities)
+- date: '2026-10-04'
+  change: post hoc option-aware verifier control registered (cached first-pass answers, TeleQnA, seed 1, decision rule fixed
+    before it ran); analysis additions for it
+- date: '2026-10-05'
+  change: control script gains a standalone registry fallback (no change to prompts, scoring, seeds or outputs); analysis
+    additions for the control's sensitivities
+- date: '2026-10-06'
+  change: compact per-policy seed-mean AURC table; no computed value changes
+- date: '2026-10-07'
+  change: figure rendering only (embedded TrueType fonts, cost figure layout, resample-count formatting); no computed value
+    changes
+- date: '2026-10-08'
+  change: cost figure axis label shortened; no computed value changes
+posthoc_controls:
+  verifier_gated_opt:
+    purpose: test whether the TeleQnA finding depends on the verifier not seeing the other answer options
+    script: environment/control_option_aware.py
+    script_sha256: 6318ed5306a234fd1b55a57090acadf2c903995c632c26e0752a9d10e1d62b01
+    script_sha256_history:
+    - 8335eab55fbe52e7d126bc07ec05e35f62eb58aad311df724cf27bd225419add
+    - 3c7d5df2a4f3efce19c6a2c6bf9b9dbec8b72bcd4d37527b07567fbb440e4527
+    - 248ea3ee020e1cf3e795d8871925715ac0c358069bd3698d40d8283e5168f238
+    script_history_note: the first 20-item 7B smoke run carries 8335eab5 (before the final decision rule); the three executed
+      control records and the later smoke runs carry 3c7d5df2; later versions add a standalone registry fallback for reservation
+      and append and change nothing in prompts, scoring, request seeds or outputs; the control is not re-run
+    design: identical to verifier_gated (same YES/NO wording, temperature 0, top-20 scoring, request-seed role, threshold)
+      except that the verification prompt lists all answer options before the proposed answer; scores the cached v2 first-pass
+      answers of the same dataset, model and seed; never regenerates a first pass
+    scope:
+      datasets:
+      - teleqna
+      seeds:
+      - 1
+      models:
+      - qwen2.5-coder-7b-instruct
+      - qwen3-coder-30b-a3b-instruct
+      - llama-3.3-70b-instruct
+      items: the fixed 1,500-question frame
+    registry: every attempt, including refusals and failures, is appended to experiments/registry.json with kind posthoc_control
+      (smoke runs with kind smoke); the pre-registered analysis ignores these kinds
+    analysis: seed-1 tie-aware AURC of the option-aware verifier against verifier_gated and against the best free signal on
+      the same rows, item-level bootstrap intervals; POST-HOC, uncorrected, single seed
+    decision_rule: 'the paper reports the control whatever it shows; it does not change an H1 outcome. Reading per model,
+      from the 10,000-resample item-level bootstrap interval of AURC(option-aware) minus AURC(best free signal) on the seed-1
+      rows: interval entirely below zero -> the paper says the pre-registered TeleQnA finding for that model is specific to
+      the option-blind verifier prompt; interval entirely above zero -> the paper says the finding persists with an option-aware
+      verifier for that model; interval containing zero -> the paper says the control neither shows nor excludes prompt specificity
+      for that model. The difference option-aware minus verifier_gated is reported alongside for all three models with its
+      interval. Exactly one ok posthoc_control record per model is analysed; if more than one ok record exists for a model
+      the paper reports all of them. The paper states that the control ran about 30 hours after the base verifier cells (from
+      a different client through an ssh tunnel) on a server whose llama.cpp build is not proven, that it is single-seed, post
+      hoc and uncorrected, and that the further model (Gemma) is not covered'
+    final: the control is run once; no re-run or redesign after its results are seen (a defect found later is disclosed)
+model_pins:
+  server: LM Studio 0.4.25 (llama.cpp engine), macOS 27, Apple M3 Ultra 96 GB, one model resident at a time, reasoning_effort
+    none, parallel 4
+  models:
+    qwen2.5-coder-7b-instruct: Q4_K_M GGUF, lmstudio-community, Apache-2.0
+    qwen3-coder-30b-a3b-instruct: Q4_K_M GGUF, lmstudio-community, Apache-2.0
+    llama-3.3-70b-instruct: Q4_K_M GGUF, lmstudio-community, Llama 3.3 community licence
+    gemma-4-31b-it-qat: QAT Q4_0 GGUF, lmstudio-community, Apache-2.0 (verified 2026-10-05 against the publisher pages; earlier
+      versions of this protocol said Gemma terms, which was wrong)
+  manifest: environment/models.json records each GGUF file (publisher repository, filename, bytes, SHA-256), the LM Studio
+    version and the selected llama.cpp runtime as read on the server on 2026-10-04 (after the runs; older runtimes remain
+    installed, so the build that served the runs is not proven; environment/serving_evidence.json records file timestamps
+    of the runtime selection); environment/verify_models.py checks local files against it
+  benchmarks:
+    TeleQnA: github.com/netop-team/TeleQnA commit d7ee5e3 (2024-01-15), MIT
+    NetConfEval: github.com/RedHatResearch/conext24-NetConfEval commit 24edc15 (2025-03-30), MIT
+seed_independence_check: smoke cells run under every protocol seed on both datasets; a duplicate-stream signature blocks execution
+  and near-determinism is reported
+v1_history:
+  what: 'first execution of the matrix (runner 1f64168c): seeds 1, 2, 3 and the replacement seed 42; all records stay in the
+    registry and are ignored by the analysis (older runner hash)'
+  seed_note: 'seed 3 replaced by 42 on 2026-09-28: a diagnostic (scratch re-generation of the 7B TeleQnA first pass, 600-1,500
+    items) showed that the LM Studio server reproduces each seed exactly but yields the SAME sample stream for seeds 2, 3,
+    7, 11 and 1003 (identical predictions on 99.9-100% of items), while seeds 1 and 42 are distinct (seed 42 agrees with seed
+    2 on 89.2% and with seed 1 on 69.7% of the 7B''s items; seeds 1 and 2 agree on 66.5%). Seed-3 cells stay in the registry
+    as history and are excluded from the analysis by the seeds list; seed-42 cells are executed with the unchanged runner.
+    Seed replication on this server is weaker than the design assumed and the paper says so; the primary inference is the
+    item-level clustered bootstrap. Seed 42 is final: any duplication it shows is reported, not repaired again'
+  seed_agreement_after_repair:
+    basis: identical option id (TeleQnA) or identical canonical specification (NetConfEval; raw first-pass text when the reply
+      has no parsable specification, which applies to 87-111 of the 7B's batches per seed) between seed pairs, unguarded first
+      pass
+    teleqna:
+      qwen2.5-coder-7b:
+        1/2: 0.666
+        1/42: 0.702
+        2/42: 0.889
+      qwen3-coder-30b:
+        1/2: 0.937
+        1/42: 0.947
+        2/42: 0.982
+      llama-3.3-70b:
+        1/2: 0.949
+        1/42: 0.955
+        2/42: 0.991
+    netconfeval_t1:
+      qwen2.5-coder-7b:
+        1/2: 0.329
+        1/42: 0.433
+        2/42: 0.416
+      qwen3-coder-30b:
+        1/2: 0.913
+        1/42: 0.916
+        2/42: 0.998
+      llama-3.3-70b:
+        1/2: 0.94
+        1/42: 0.94
+        2/42: 0.973
+    reading: 'seed 42 is a distinct sample (not a duplicate of seed 2 on any TeleQnA cell; it differs from seed 2 on 11% of
+      the 7B''s TeleQnA items), but seeds 2 and 42 agree more often than seeds 1 and 2 on all six cells and more often than
+      seeds 1 and 42 on five of six (the exception is the 7B on NetConfEval: 0.433 vs 0.416); for the 30B on NetConfEval seeds
+      2 and 42 coincide on 99.8% of batches. Under the final-seed rule this is REPORTED, not repaired: the seed check reports
+      it as a warning, the paper states the overlap, and inference rests on the item-level clustered bootstrap'
+  headline_outcomes: 'TeleQnA: free signals better than the verifier for all three pre-registered models on every seed; NetConfEval:
+    verifier better for the 70B, margin better for the 30B, no significant difference for the 7B'
+  why_superseded: 'a diagnostic on 2026-10-01 showed that the server re-seeds its sampler on every request, so a raw seed
+    applied ONE sampling quantile to every item: under seed 1 the first pass chose a non-top option on almost every TeleQnA
+    item whose top option was below about 0.8 after temperature scaling, under seed 2 almost never; the five self-consistency
+    samples collapsed to one or two draws shared across items. Seeds were therefore not independent per-item samples and the
+    self-consistency baselines were not i.i.d. sampling'
+sampling_repair:
+  scheme: every sampled request uses request_seed = sha256(seed|item id|role|sample index) mod 2147483647 (artifact/run_cell.py),
+    so draws are independent across items, seeds and samples; the k=1 control sample is sample 0 of the k=5 set
+  cache: first-pass caches carry the tag v2; v1 caches are never served
+  stored: self-consistency samples are stored per item (samples, n_distinct_samples); result.json records the scheme and the
+    temperatures (first pass 0.3, samples 0.7, verifier and confidence 0.0)
+  server_facts_verified: sampling honours the request temperature (a 0.76/0.24 token pair gave the top token on 118/120 draws
+    at T=0.3, 102/120 at 0.7, 92/120 at 1.0); the reported token probabilities are raw (identical at T=0, 0.3, 0.7; within
+    0.001 at 1.0), so the free signals are computed on the model's raw probabilities
+  pre_run_check: '7B, 300 TeleQnA items, v2 runner: identical predictions between seed pairs 0.940 / 0.927 / 0.933; non-argmax
+    share among low-confidence items 0.64 / 0.59 / 0.64; k=5 agreement histogram spread over all levels, mean distinct samples
+    1.40; k=1 sample equals k=5 sample 0 on 300/300 items'
+  decision_rule: the paper reports the v2 execution only; it states the v1 headline outcomes and whether v2 agrees; a disagreement
+    between v1 and v2 on any H1 outcome is reported as such, not resolved by choosing
+  final_execution: 'the v2 execution is final: whatever it shows is reported; no further re-execution or seed change will
+    be made after v2 results are seen (a defect found later is disclosed as a limitation)'
+  known_properties: request seeds are 31-bit, so a handful of collisions among roughly 100,000 requests is expected by the
+    birthday bound; a collision pairs two unrelated requests and does not couple items systematically. The first-pass cache
+    write is not atomic, so concurrent cold cells could each sample their own first pass; the executor prevents this by running
+    the first-listed method (unguarded) for every (dataset, model, seed) before any other cell and the v2 run uses one worker
+  execution: smoke cells first, then the full matrix and sensitivity cells, one worker on the server

@@ -1,0 +1,48 @@
+{
+ "run_id": "unguarded-netconfeval_t1-s1-qwen2.5-coder-7b-instruct",
+ "kind": "full",
+ "status": "ok",
+ "method": "unguarded",
+ "dataset": "netconfeval_t1",
+ "model": "qwen2.5-coder-7b-instruct",
+ "seed": 1,
+ "evaluator_id": "e_netconfeval",
+ "n": 450,
+ "metric_values": {
+  "accuracy": 0.62,
+  "aurc": 0.3545,
+  "coverage": 0.7378,
+  "declined_rate": 0.2622,
+  "extra_tokens_per_item": 0.0,
+  "format_failure_rate": 0.0,
+  "latency_s_per_item": 0.73,
+  "policy_latency_s_per_item": 0.0,
+  "selective_accuracy": 0.8404,
+  "selective_accuracy_at_0.7": 0.6349,
+  "selective_accuracy_at_0.8": 0.625,
+  "selective_accuracy_at_0.9": 0.6296,
+  "tokens_per_item": 882.8
+ },
+ "outputs": [
+  "experiments/runs/unguarded-netconfeval_t1-s1-qwen2.5-coder-7b-instruct/r2/attempt-1.log",
+  "experiments/runs/unguarded-netconfeval_t1-s1-qwen2.5-coder-7b-instruct/r2/predictions.jsonl",
+  "experiments/runs/unguarded-netconfeval_t1-s1-qwen2.5-coder-7b-instruct/r2/result.json"
+ ],
+ "runner_sha256": "5b1c418e0073a784a85e54d7bcf3f4f189d8060a833a6f4ff7aa9f8b4b139e04",
+ "config_sha256": "7fcc36c78b410e0d164ac66167724bc529873760d482d9e9460d2ca0c98321a6",
+ "artifact_sha256": "1f27b603e1643281ec63110d005ea8d3211919b30ea74a1aac2434c04469f040",
+ "started_at": "2026-10-03T09:27:03+00:00",
+ "finished_at": "2026-10-03T09:32:16+00:00",
+ "hardware": "<HOST>",
+ "attempts": [
+  {
+   "attempt": 1,
+   "exit_code": 0,
+   "seconds": 313.0
+  }
+ ],
+ "error": "",
+ "extra": {
+  "cache": "<REPO>/experiments/cache/firstpass-netconfeval_t1-prwl-v2-qwen2.5-coder-7b-instruct-s1.jsonl"
+ }
+}

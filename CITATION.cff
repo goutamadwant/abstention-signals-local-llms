@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use this code or data, please cite it as below."
+title: "Free Signals or Self-Verification? Abstention signals for local LLMs: code and data"
+type: software
+authors:
+  - family-names: Adwant
+    given-names: Goutam
+repository-code: "https://github.com/goutamadwant/abstention-signals-local-llms"
+license: MIT
+version: "1.0"
+date-released: 2026-10-09

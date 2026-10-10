@@ -1,0 +1,45 @@
+{
+ "metric_values": {
+  "format_failure_rate": 0.0,
+  "declined_rate": 0.0007,
+  "aurc": 0.1395,
+  "selective_accuracy": 0.7195,
+  "coverage": 0.9247,
+  "accuracy": 0.69,
+  "selective_accuracy_at_0.9": 0.7259,
+  "selective_accuracy_at_0.8": 0.7583,
+  "selective_accuracy_at_0.7": 0.7943,
+  "tokens_per_item": 269.3,
+  "extra_tokens_per_item": 143.8,
+  "latency_s_per_item": 0.308,
+  "policy_latency_s_per_item": 0.184
+ },
+ "sampling": {
+  "scheme": "per-item request seeds: sha256(seed|item|role|j)",
+  "first_pass_temperature": 0.3,
+  "sample_temperature": 0.7,
+  "verifier_temperature": 0.0,
+  "confidence_temperature": 0.0
+ },
+ "evaluator_id": "e_teleqna",
+ "n": 1500,
+ "dataset": "teleqna",
+ "model": "qwen2.5-coder-7b-instruct",
+ "method": "verifier_gated_opt",
+ "seed": 1,
+ "host": "http://127.0.0.1:11435",
+ "threshold": 0.5,
+ "first_pass_temperature": 0.3,
+ "cache": "<REPO>/experiments/cache/firstpass-teleqna-v2-qwen2.5-coder-7b-instruct-s1.jsonl",
+ "control": {
+  "post_hoc": true,
+  "label": "POST-HOC",
+  "base_method": "verifier_gated",
+  "verifier_role": "verifier",
+  "change": "verifier prompt lists every answer option of the question before the proposed answer; wording, temperature, top-20 scoring, threshold, request seeds (same role, so the same seed per item) and cached first pass as verifier_gated",
+  "first_pass": "cached v2 first pass only (never regenerated)",
+  "runner_sha256": "5b1c418e0073a784a85e54d7bcf3f4f189d8060a833a6f4ff7aa9f8b4b139e04",
+  "control_script_sha256": "3c7d5df2a4f3efce19c6a2c6bf9b9dbec8b72bcd4d37527b07567fbb440e4527",
+  "frame_limit": 1500
+ }
+}

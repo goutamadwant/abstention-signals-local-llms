@@ -1,0 +1,34 @@
+{
+ "metric_values": {
+  "format_failure_rate": 0.0,
+  "declined_rate": 0.0007,
+  "aurc": 0.1599,
+  "selective_accuracy": 0.7705,
+  "coverage": 0.8687,
+  "accuracy": 0.7453,
+  "selective_accuracy_at_0.9": 0.7637,
+  "selective_accuracy_at_0.8": 0.7942,
+  "selective_accuracy_at_0.7": 0.8105,
+  "tokens_per_item": 366.1,
+  "extra_tokens_per_item": 240.5,
+  "latency_s_per_item": 0.227,
+  "policy_latency_s_per_item": 0.101
+ },
+ "sampling": {
+  "scheme": "per-item request seeds: sha256(seed|item|role|j)",
+  "first_pass_temperature": 0.3,
+  "sample_temperature": 0.7,
+  "verifier_temperature": 0.0,
+  "confidence_temperature": 0.0
+ },
+ "evaluator_id": "e_teleqna",
+ "n": 1500,
+ "dataset": "teleqna",
+ "model": "qwen3-coder-30b-a3b-instruct",
+ "method": "verifier_gated_fs",
+ "seed": 1,
+ "host": "http://127.0.0.1:1234",
+ "threshold": 0.5,
+ "first_pass_temperature": 0.3,
+ "cache": "<REPO>/experiments/cache/firstpass-teleqna-v2-qwen3-coder-30b-a3b-instruct-s1.jsonl"
+}

@@ -1,0 +1,8 @@
+# Exact versions installed on the worker that ran the experiments (macOS, Apple M3 Ultra): CPython 3.14.7 (Homebrew).
+# run_cell.py needs sortedcontainers (NetConfEval loader); deepdiff is imported by the NetConfEval checkout;
+# pyyaml and matplotlib are used by the analysis scripts.
+# The analysis outputs under ../analysis were generated on a second machine (CPython 3.12.7) with matplotlib 3.9.2 and PyYAML 6.0.1.
+sortedcontainers==2.4.0
+deepdiff==9.1.0
+pyyaml==6.0.3
+matplotlib==3.11.2

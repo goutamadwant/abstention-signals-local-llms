@@ -1,0 +1,262 @@
+{
+ "source_manifest_analysis_script_sha256": "52149e4e07bd54e39d2b32f64eda2ac2e3cc91798f58485dbb27fea5237fd9be",
+ "source_manifest_runner_sha256": "5b1c418e0073a784a85e54d7bcf3f4f189d8060a833a6f4ff7aa9f8b4b139e04",
+ "source_manifest_registry_sha256": "6d0ba0dbb24ecae67d3a49dcf65974da1cce2794f4fbcd368b21562e1660b498",
+ "published_registry_sha256s": [
+  "6d0ba0dbb24ecae67d3a49dcf65974da1cce2794f4fbcd368b21562e1660b498",
+  "7d75dc1dae8ab657865782b99bc4acb4510fbe9378e1f1adc20241cb4c647093"
+ ],
+ "abs_tol_aurc": 0.02,
+ "decisive_dataset": "teleqna",
+ "preregistered_models": [
+  "qwen2.5-coder-7b-instruct",
+  "qwen3-coder-30b-a3b-instruct",
+  "llama-3.3-70b-instruct"
+ ],
+ "rows": [
+  {
+   "dataset": "netconfeval_t1",
+   "model": "llama-3.3-70b-instruct",
+   "outcome": "verifier_better",
+   "best_free_signal": "margin_gate",
+   "delta": -0.02874,
+   "ci": [
+    -0.04658,
+    -0.01226
+   ],
+   "seeds_agree_in_sign": true,
+   "per_seed_delta": [
+    -0.02799,
+    -0.02803,
+    -0.03018
+   ],
+   "cell_n": {
+    "1": [
+     450,
+     450
+    ],
+    "2": [
+     450,
+     450
+    ],
+    "3": [
+     450,
+     450
+    ]
+   }
+  },
+  {
+   "dataset": "netconfeval_t1",
+   "model": "qwen2.5-coder-7b-instruct",
+   "outcome": "free_signal_better",
+   "best_free_signal": "margin_gate",
+   "delta": 0.03124,
+   "ci": [
+    0.00131,
+    0.06362
+   ],
+   "seeds_agree_in_sign": true,
+   "per_seed_delta": [
+    0.01703,
+    0.02725,
+    0.04902
+   ],
+   "cell_n": {
+    "1": [
+     450,
+     450
+    ],
+    "2": [
+     450,
+     450
+    ],
+    "3": [
+     450,
+     450
+    ]
+   }
+  },
+  {
+   "dataset": "netconfeval_t1",
+   "model": "qwen3-coder-30b-a3b-instruct",
+   "outcome": "free_signal_better",
+   "best_free_signal": "margin_gate",
+   "delta": 0.03673,
+   "ci": [
+    0.01267,
+    0.06222
+   ],
+   "seeds_agree_in_sign": true,
+   "per_seed_delta": [
+    0.03905,
+    0.03446,
+    0.03665
+   ],
+   "cell_n": {
+    "1": [
+     450,
+     450
+    ],
+    "2": [
+     450,
+     450
+    ],
+    "3": [
+     450,
+     450
+    ]
+   }
+  },
+  {
+   "dataset": "teleqna",
+   "model": "gemma-4-31b-it-qat",
+   "outcome": "verifier_better",
+   "best_free_signal": "margin_gate",
+   "delta": -0.03569,
+   "ci": [
+    -0.055,
+    -0.01714
+   ],
+   "seeds_agree_in_sign": true,
+   "per_seed_delta": [
+    -0.03569
+   ],
+   "cell_n": {
+    "1": [
+     1500,
+     1500
+    ],
+    "2": [
+     null,
+     null
+    ],
+    "3": [
+     null,
+     null
+    ]
+   }
+  },
+  {
+   "dataset": "teleqna",
+   "model": "llama-3.3-70b-instruct",
+   "outcome": "free_signal_better",
+   "best_free_signal": "margin_gate",
+   "delta": 0.04828,
+   "ci": [
+    0.03622,
+    0.06128
+   ],
+   "seeds_agree_in_sign": true,
+   "per_seed_delta": [
+    0.0505,
+    0.04806,
+    0.04627
+   ],
+   "cell_n": {
+    "1": [
+     1500,
+     1500
+    ],
+    "2": [
+     1500,
+     1500
+    ],
+    "3": [
+     1500,
+     1500
+    ]
+   }
+  },
+  {
+   "dataset": "teleqna",
+   "model": "qwen2.5-coder-7b-instruct",
+   "outcome": "free_signal_better",
+   "best_free_signal": "logprob_gate",
+   "delta": 0.06431,
+   "ci": [
+    0.05035,
+    0.07884
+   ],
+   "seeds_agree_in_sign": true,
+   "per_seed_delta": [
+    0.06482,
+    0.0672,
+    0.06088
+   ],
+   "cell_n": {
+    "1": [
+     1500,
+     1500
+    ],
+    "2": [
+     1500,
+     1500
+    ],
+    "3": [
+     1500,
+     1500
+    ]
+   }
+  },
+  {
+   "dataset": "teleqna",
+   "model": "qwen3-coder-30b-a3b-instruct",
+   "outcome": "free_signal_better",
+   "best_free_signal": "margin_gate",
+   "delta": 0.07441,
+   "ci": [
+    0.05765,
+    0.09205
+   ],
+   "seeds_agree_in_sign": true,
+   "per_seed_delta": [
+    0.0743,
+    0.07516,
+    0.07371
+   ],
+   "cell_n": {
+    "1": [
+     1500,
+     1500
+    ],
+    "2": [
+     1500,
+     1500
+    ],
+    "3": [
+     1500,
+     1500
+    ]
+   }
+  },
+  {
+   "dataset": "teleqna_full",
+   "model": "qwen3-coder-30b-a3b-instruct",
+   "outcome": "free_signal_better",
+   "best_free_signal": "margin_gate",
+   "delta": 0.07068,
+   "ci": [
+    0.06451,
+    0.07705
+   ],
+   "seeds_agree_in_sign": true,
+   "per_seed_delta": [
+    0.07068
+   ],
+   "cell_n": {
+    "1": [
+     10000,
+     10000
+    ],
+    "2": [
+     null,
+     null
+    ],
+    "3": [
+     null,
+     null
+    ]
+   }
+  }
+ ]
+}

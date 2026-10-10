@@ -1,0 +1,91 @@
+{
+ "read_at_utc": "2026-10-09T02:45:00Z",
+ "how": "read over ssh from the model server after the runs (python os.stat and sha256 of the files below); home directory written as ~",
+ "run_window_utc": [
+  "2026-10-03T08:42:48Z",
+  "2026-10-05T01:20:02Z"
+ ],
+ "reading": "The GGUF engine selection (backend-preferences-v1.json: llama.cpp-mac-arm64-apple-metal-advsimd 2.41.0) and the HTTP server settings file were last modified before the run window and not since, and the selected engine directory was installed on 2026-09-19. This is file-timestamp evidence of the selection in force during the runs, not a per-request record: LM Studio's server logs record requests and responses but not the engine, and a per-model engine override would not be visible here.",
+ "backend_preferences": {
+  "path": "~/.lmstudio/.internal/backend-preferences-v1.json",
+  "modified_utc": "2026-09-19T17:46:49Z",
+  "sha256": "cb82053e15ed3ff0e357305144dd22499b34d0f22bfeab1e232ce6a24747f222",
+  "bytes": 239,
+  "content": [
+   {
+    "model_format": "safetensors",
+    "name": "mlx-llm-mac-arm64-apple-metal-advsimd",
+    "version": "1.11.0"
+   },
+   {
+    "model_format": "gguf",
+    "name": "llama.cpp-mac-arm64-apple-metal-advsimd",
+    "version": "2.41.0"
+   }
+  ]
+ },
+ "http_server_config": {
+  "path": "~/.lmstudio/.internal/http-server-config.json",
+  "modified_utc": "2026-09-04T03:54:29Z",
+  "sha256": "b677c02ed390d6a220c0ea7c778c10f1ce5d172ae43750e4990dcbfda5f0c174",
+  "bytes": 263
+ },
+ "engine_dir": {
+  "path": "~/.lmstudio/extensions/backends/llama.cpp-mac-arm64-apple-metal-advsimd-2.41.0/",
+  "modified_utc": "2026-09-19T17:46:48Z"
+ },
+ "engine_files": {
+  "backend-manifest.json": {
+   "modified_utc": "2000-01-01T00:00:00Z",
+   "sha256": "ce74a5dab212777ce2978086b5b6beb39828659d3dcc9054194b63bb2390e0c0",
+   "bytes": 878
+  },
+  "libggml_llamacpp.dylib": {
+   "modified_utc": "2000-01-01T00:00:00Z",
+   "sha256": "0eb52cb122ff1f6cc542137754ee2bf5a99a246af400a6d8ec5fa7126e8b4f63",
+   "bytes": 79040
+  },
+  "libggml-metal.dylib": {
+   "modified_utc": "2000-01-01T00:00:00Z",
+   "sha256": "bf77724e32bcc1959912540ac0411860fa6a266f7f5188d315c55af8fef5c3ca",
+   "bytes": 2181648
+  },
+  "libllama-common.0.dylib": {
+   "modified_utc": "2000-01-01T00:00:00Z",
+   "sha256": "785f1b865997310d12877755664b321b9a4c5b0397c35c71804431ac3b75b37c",
+   "bytes": 5520624
+  }
+ },
+ "engine_manifest": {
+  "version": "2.41.0",
+  "domains": [
+   "llm",
+   "embedding"
+  ],
+  "engine": "llama.cpp",
+  "target_libraries": [
+   {
+    "name": "llm_engine.node",
+    "type": "llm_engine",
+    "version": "0.1.2"
+   },
+   {
+    "name": "liblmstudio_bindings.node",
+    "type": "liblmstudio",
+    "version": "0.2.26"
+   }
+  ],
+  "platform": "mac",
+  "cpu": {
+   "architecture": "ARM64",
+   "instruction_set_extensions": [
+    "AdvSIMD"
+   ]
+  },
+  "gpu": {
+   "make": "Apple",
+   "framework": "Metal"
+  },
+  "name": "llama.cpp-mac-arm64-apple-metal-advsimd"
+ }
+}

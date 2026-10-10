@@ -1,0 +1,25 @@
+\begin{tabular}{lllrrrrr}
+\toprule
+Task & Model & Free signal & Seed & $n_{01}$ & $n_{10}$ & $p$ & OR \\
+\midrule
+NetConfEval & 70B & margin & 1 & 32 & 26 & 0.512 & 1.23 \\
+NetConfEval & 70B & margin & 2 & 32 & 25 & 0.427 & 1.28 \\
+NetConfEval & 70B & margin & 3 & 34 & 25 & 0.298 & 1.36 \\
+NetConfEval & 7B & margin & 1 & 27 & 0 & $<$0.001 & n/a$^\dagger$ \\
+NetConfEval & 7B & margin & 2 & 24 & 0 & $<$0.001 & n/a$^\dagger$ \\
+NetConfEval & 7B & margin & 3 & 21 & 0 & $<$0.001 & n/a$^\dagger$ \\
+NetConfEval & 30B & margin & 1 & 43 & 54 & 0.310 & 0.80 \\
+NetConfEval & 30B & margin & 2 & 44 & 52 & 0.475 & 0.85 \\
+NetConfEval & 30B & margin & 3 & 43 & 53 & 0.358 & 0.81 \\
+TeleQnA & 70B & margin & 1 & 77 & 121 & 0.002 & 0.64 \\
+TeleQnA & 70B & margin & 2 & 82 & 121 & 0.007 & 0.68 \\
+TeleQnA & 70B & margin & 3 & 82 & 120 & 0.009 & 0.68 \\
+TeleQnA & 7B & max-logprob & 1 & 61 & 111 & $<$0.001 & 0.55 \\
+TeleQnA & 7B & max-logprob & 2 & 60 & 112 & $<$0.001 & 0.54 \\
+TeleQnA & 7B & max-logprob & 3 & 62 & 108 & $<$0.001 & 0.57 \\
+TeleQnA & 30B & margin & 1 & 92 & 140 & 0.002 & 0.66 \\
+TeleQnA & 30B & margin & 2 & 88 & 139 & $<$0.001 & 0.63 \\
+TeleQnA & 30B & margin & 3 & 91 & 139 & 0.002 & 0.65 \\
+\bottomrule
+\multicolumn{8}{l}{$^\dagger$ $n_{10}=0$: odds ratio $n_{01}/n_{10}$ undefined.} \\
+\end{tabular}

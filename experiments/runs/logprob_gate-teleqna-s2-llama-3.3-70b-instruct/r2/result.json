@@ -1,0 +1,34 @@
+{
+ "metric_values": {
+  "format_failure_rate": 0.0,
+  "declined_rate": 0.002,
+  "aurc": 0.0889,
+  "selective_accuracy": 0.7869,
+  "coverage": 0.976,
+  "accuracy": 0.776,
+  "selective_accuracy_at_0.9": 0.8141,
+  "selective_accuracy_at_0.8": 0.8558,
+  "selective_accuracy_at_0.7": 0.8943,
+  "tokens_per_item": 146.4,
+  "extra_tokens_per_item": 0.0,
+  "latency_s_per_item": 1.063,
+  "policy_latency_s_per_item": 0.0
+ },
+ "sampling": {
+  "scheme": "per-item request seeds: sha256(seed|item|role|j)",
+  "first_pass_temperature": 0.3,
+  "sample_temperature": 0.7,
+  "verifier_temperature": 0.0,
+  "confidence_temperature": 0.0
+ },
+ "evaluator_id": "e_teleqna",
+ "n": 1500,
+ "dataset": "teleqna",
+ "model": "llama-3.3-70b-instruct",
+ "method": "logprob_gate",
+ "seed": 2,
+ "host": "http://127.0.0.1:1234",
+ "threshold": 0.6,
+ "first_pass_temperature": 0.3,
+ "cache": "<REPO>/experiments/cache/firstpass-teleqna-v2-llama-3.3-70b-instruct-s2.jsonl"
+}

@@ -1,0 +1,47 @@
+\begin{tabular}{llrrrr}
+\toprule
+Dataset & Model & Policy & Tokens/item & Extra tokens & s/item \\
+\midrule
+NetConfEval & Llama-3.3-70B & verbalised confidence & 1113 & 204 & 7.30 \\
+NetConfEval & Llama-3.3-70B & max-logprob & 909 & 0 & 5.71 \\
+NetConfEval & Llama-3.3-70B & margin & 909 & 0 & 5.71 \\
+NetConfEval & Llama-3.3-70B & self-consistency k=1 & 1819 & 910 & 11.37 \\
+NetConfEval & Llama-3.3-70B & unguarded & 909 & 0 & 5.71 \\
+NetConfEval & Llama-3.3-70B & verifier gate (P(True)) & 1107 & 198 & 7.17 \\
+NetConfEval & Qwen2.5-Coder-7B & verbalised confidence & 1070 & 186 & 0.89 \\
+NetConfEval & Qwen2.5-Coder-7B & max-logprob & 885 & 0 & 0.75 \\
+NetConfEval & Qwen2.5-Coder-7B & margin & 885 & 0 & 0.75 \\
+NetConfEval & Qwen2.5-Coder-7B & self-consistency k=5 & 5320 & 4436 & 4.16 \\
+NetConfEval & Qwen2.5-Coder-7B & self-consistency k=1 & 1772 & 888 & 1.49 \\
+NetConfEval & Qwen2.5-Coder-7B & unguarded & 885 & 0 & 0.75 \\
+NetConfEval & Qwen2.5-Coder-7B & verifier gate (P(True)) & 1059 & 175 & 0.88 \\
+NetConfEval & Qwen3-Coder-30B-A3B & verbalised confidence & 1114 & 202 & 1.28 \\
+NetConfEval & Qwen3-Coder-30B-A3B & max-logprob & 912 & 0 & 1.12 \\
+NetConfEval & Qwen3-Coder-30B-A3B & margin & 912 & 0 & 1.12 \\
+NetConfEval & Qwen3-Coder-30B-A3B & self-consistency k=5 & 5469 & 4557 & 6.03 \\
+NetConfEval & Qwen3-Coder-30B-A3B & self-consistency k=1 & 1823 & 911 & 2.17 \\
+NetConfEval & Qwen3-Coder-30B-A3B & unguarded & 912 & 0 & 1.12 \\
+NetConfEval & Qwen3-Coder-30B-A3B & verifier gate (P(True)) & 1103 & 191 & 1.26 \\
+TeleQnA & Llama-3.3-70B & verbalised confidence & 256 & 110 & 1.87 \\
+TeleQnA & Llama-3.3-70B & max-logprob & 146 & 0 & 1.07 \\
+TeleQnA & Llama-3.3-70B & margin & 146 & 0 & 1.07 \\
+TeleQnA & Llama-3.3-70B & self-consistency k=5 & 878 & 732 & 2.70 \\
+TeleQnA & Llama-3.3-70B & self-consistency k=1 & 293 & 146 & 2.11 \\
+TeleQnA & Llama-3.3-70B & unguarded & 146 & 0 & 1.07 \\
+TeleQnA & Llama-3.3-70B & verifier gate (P(True)) & 248 & 102 & 1.78 \\
+TeleQnA & Qwen2.5-Coder-7B & verbalised confidence & 219 & 93 & 0.21 \\
+TeleQnA & Qwen2.5-Coder-7B & max-logprob & 126 & 0 & 0.10 \\
+TeleQnA & Qwen2.5-Coder-7B & margin & 126 & 0 & 0.10 \\
+TeleQnA & Qwen2.5-Coder-7B & self-consistency k=5 & 753 & 627 & 0.33 \\
+TeleQnA & Qwen2.5-Coder-7B & self-consistency k=1 & 251 & 126 & 0.19 \\
+TeleQnA & Qwen2.5-Coder-7B & unguarded & 126 & 0 & 0.10 \\
+TeleQnA & Qwen2.5-Coder-7B & verifier gate (P(True)) & 206 & 80 & 0.19 \\
+TeleQnA & Qwen3-Coder-30B-A3B & verbalised confidence & 219 & 94 & 0.23 \\
+TeleQnA & Qwen3-Coder-30B-A3B & max-logprob & 126 & 0 & 0.12 \\
+TeleQnA & Qwen3-Coder-30B-A3B & margin & 126 & 0 & 0.12 \\
+TeleQnA & Qwen3-Coder-30B-A3B & self-consistency k=5 & 754 & 628 & 0.35 \\
+TeleQnA & Qwen3-Coder-30B-A3B & self-consistency k=1 & 251 & 126 & 0.22 \\
+TeleQnA & Qwen3-Coder-30B-A3B & unguarded & 126 & 0 & 0.12 \\
+TeleQnA & Qwen3-Coder-30B-A3B & verifier gate (P(True)) & 206 & 81 & 0.22 \\
+\bottomrule
+\end{tabular}

@@ -1,0 +1,51 @@
+{
+ "run_id": "verifier_gated_opt-teleqna-s1-qwen2.5-coder-7b-instruct",
+ "kind": "posthoc_control",
+ "status": "ok",
+ "method": "verifier_gated_opt",
+ "dataset": "teleqna",
+ "model": "qwen2.5-coder-7b-instruct",
+ "seed": 1,
+ "evaluator_id": "e_teleqna",
+ "n": 1500,
+ "metric_values": {
+  "accuracy": 0.69,
+  "aurc": 0.1395,
+  "coverage": 0.9247,
+  "declined_rate": 0.0007,
+  "extra_tokens_per_item": 143.8,
+  "format_failure_rate": 0.0,
+  "latency_s_per_item": 0.308,
+  "policy_latency_s_per_item": 0.184,
+  "selective_accuracy": 0.7195,
+  "selective_accuracy_at_0.7": 0.7943,
+  "selective_accuracy_at_0.8": 0.7583,
+  "selective_accuracy_at_0.9": 0.7259,
+  "tokens_per_item": 269.3
+ },
+ "outputs": [
+  "experiments/runs/verifier_gated_opt-teleqna-s1-qwen2.5-coder-7b-instruct/r2/attempt-1.log",
+  "experiments/runs/verifier_gated_opt-teleqna-s1-qwen2.5-coder-7b-instruct/r2/predictions.jsonl",
+  "experiments/runs/verifier_gated_opt-teleqna-s1-qwen2.5-coder-7b-instruct/r2/result.json"
+ ],
+ "out_dir": "experiments/runs/verifier_gated_opt-teleqna-s1-qwen2.5-coder-7b-instruct/r2",
+ "runner_sha256": "5b1c418e0073a784a85e54d7bcf3f4f189d8060a833a6f4ff7aa9f8b4b139e04",
+ "config_sha256": "f7c3427a8cb179d2b11922384dbd2dbb8fdd8e550d87e377ab2f4c916269e5a0",
+ "artifact_sha256": "8e541cde66bcfa953a88ed4c38d1ed29cc7f0ec588dfe8c455a102691e330c49",
+ "control_script_sha256": "3c7d5df2a4f3efce19c6a2c6bf9b9dbec8b72bcd4d37527b07567fbb440e4527",
+ "post_hoc": true,
+ "started_at": "2026-10-05T00:38:11+00:00",
+ "finished_at": "2026-10-05T00:42:48+00:00",
+ "hardware": "<HOST>",
+ "attempts": [
+  {
+   "attempt": 1,
+   "exit_code": 0,
+   "seconds": 277.5
+  }
+ ],
+ "error": "",
+ "extra": {
+  "cache": "<REPO>/experiments/cache/firstpass-teleqna-v2-qwen2.5-coder-7b-instruct-s1.jsonl"
+ }
+}

@@ -1,0 +1,108 @@
+{
+ "schema_version": 1,
+ "collected_at": "2026-10-04T14:27:26Z",
+ "host": {
+  "role": "model worker (remote Mac Studio)",
+  "os": "macOS 27.0 (build 26A428)",
+  "chip": "Apple M3 Ultra",
+  "memory_bytes": 103079215104
+ },
+ "server": {
+  "name": "LM Studio",
+  "version": "0.4.25+1",
+  "lms_cli_commit": "69d945a",
+  "runtime": {
+   "gguf_engine": "llama.cpp-mac-arm64-apple-metal-advsimd@2.41.0",
+   "mlx_engine": "mlx-llm-mac-arm64-apple-metal-advsimd@1.11.0 (not used for GGUF models)"
+  },
+  "settings": {
+   "reasoning_effort": "none",
+   "reasoning_effort_note": "sent as a request field by run_cell.py on every request; it is not a server setting and has no server-side value to read back",
+   "parallel": 4,
+   "parallel_note": "read back post-run (2026-10-04) from `lms ps --json` (`parallel`) for each model loaded while that day's probes ran (qwen2.5-coder-7b-instruct, qwen3-coder-30b-a3b-instruct, llama-3.3-70b-instruct: 4 each); see parallel_during_runs",
+   "parallel_during_runs": null,
+   "parallel_during_runs_note": "not readable: the server logs of the experiment period (from 2026-09-27) do not record the model load configuration; only the post-run value above is known",
+   "context_length_loaded": 8192,
+   "one_model_resident": true,
+   "one_model_resident_note": "read back from ~/.lmstudio/settings.json: developer.unloadPreviousJITModelOnLoad = true (a model loaded on demand replaces the previously loaded on-demand model); chat.unloadPreviousModelOnSelect = true. LM Studio has no separate 'multiple models' switch in this file. Every model switch in the probes of 2026-10-04 was also preceded by `lms unload --all`.",
+   "just_in_time_model_loading": true,
+   "jit_model_ttl_seconds": 3600,
+   "model_loading_guardrails": "high",
+   "separate_reasoning_content_in_api": true,
+   "read_back": {
+    "date": "2026-10-04",
+    "when": "post-run: read after the experiment runs finished, not during them",
+    "sources": [
+     "`lms ps --json` on the worker (loaded model: parallel, contextLength, ttlMs)",
+     "`lms status`",
+     "~/.lmstudio/settings.json (developer.*, chat.unloadPreviousModelOnSelect, modelLoadingGuardrails)",
+     "~/.lmstudio/.internal/http-server-config.json (justInTimeModelLoading, port, networkInterface 127.0.0.1)"
+    ],
+    "not_readable": "values in force during the experiment runs; only the current configuration could be read"
+   }
+  },
+  "note": "Version and selected runtime were read from the worker after the experiment runs finished (LM Studio app Info.plist; `lms runtime ls`). Older llama.cpp engines 2.28.2, 2.31.2, 2.33.0 and 2.38.0 are also installed, so the engine selected during the runs cannot be proven from the worker. `settings` was read back from the worker on 2026-10-04, after the runs (see settings.read_back); it is the configuration in force on that date, not a record of the configuration during the runs. environment/serving_evidence.json records that the engine selection file (llama.cpp 2.41.0) and the server settings file were last modified before the run window (file timestamps; not a per-request record)."
+ },
+ "models": [
+  {
+   "id": "qwen2.5-coder-7b-instruct",
+   "publisher_repo": "lmstudio-community/Qwen2.5-Coder-7B-Instruct-GGUF",
+   "file": "Qwen2.5-Coder-7B-Instruct-Q4_K_M.gguf",
+   "bytes": 4683074048,
+   "sha256": "7ec3d5cfd560c5eac34e6c377c0bbc2bda389b282dca2b28bc31e621d26929a7",
+   "quantisation": "Q4_K_M",
+   "licence": "Apache-2.0",
+   "licence_source": "https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct/blob/main/LICENSE",
+   "licence_note": "Verified 2026-10-05: Hugging Face API for Qwen/Qwen2.5-Coder-7B-Instruct reports license apache-2.0 and the LICENSE file at that URL is the Apache License 2.0 text; the lmstudio-community GGUF repository is tagged apache-2.0 and links to the same LICENSE file."
+  },
+  {
+   "id": "qwen3-coder-30b-a3b-instruct",
+   "publisher_repo": "lmstudio-community/Qwen3-Coder-30B-A3B-Instruct-GGUF",
+   "file": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+   "bytes": 18632186176,
+   "sha256": "79ad15a5ee3caddc3f4ff0db33a14454a5a3eb503d7fa1c1e35feafc579de486",
+   "quantisation": "Q4_K_M",
+   "licence": "Apache-2.0",
+   "licence_source": "https://huggingface.co/Qwen/Qwen3-Coder-30B-A3B-Instruct/blob/main/LICENSE",
+   "licence_note": "Verified 2026-10-05: Hugging Face API for Qwen/Qwen3-Coder-30B-A3B-Instruct reports license apache-2.0 and the LICENSE file at that URL is the Apache License 2.0 text. The lmstudio-community GGUF repository carries no license tag of its own; it names Qwen/Qwen3-Coder-30B-A3B-Instruct as base_model."
+  },
+  {
+   "id": "llama-3.3-70b-instruct",
+   "publisher_repo": "lmstudio-community/Llama-3.3-70B-Instruct-GGUF",
+   "file": "Llama-3.3-70B-Instruct-Q4_K_M.gguf",
+   "bytes": 42520398528,
+   "sha256": "26d297468d625586bffbff964842478fd36470b7545c70a24e0765768695ca19",
+   "quantisation": "Q4_K_M",
+   "licence": "Llama 3.3 Community License Agreement",
+   "licence_source": "https://huggingface.co/meta-llama/Llama-3.3-70B-Instruct/blob/main/LICENSE",
+   "licence_note": "Verified 2026-10-05: Hugging Face API for meta-llama/Llama-3.3-70B-Instruct reports license llama3.3 (gated: manual approval) and lists LICENSE and USE_POLICY.md among its files; the LICENSE text itself could not be fetched without an authenticated, approved account, and www.llama.com/llama3_3/license/ requires sign-in. The agreement text 'LLAMA 3.3 COMMUNITY LICENSE AGREEMENT' was read in the publicly readable README of lmstudio-community/Llama-3.3-70B-Instruct-GGUF (tagged llama3.3). The agreement carries use conditions (acceptable use policy, attribution, a 700 million monthly-active-user clause) that the Apache-2.0 models do not."
+  },
+  {
+   "id": "gemma-4-31b-it-qat",
+   "publisher_repo": "lmstudio-community/gemma-4-31B-it-QAT-GGUF",
+   "file": "gemma-4-31B-it-QAT-Q4_0.gguf",
+   "bytes": 17651000768,
+   "sha256": "e664c3b437599d70eb7c470e66aaa938c0948c1851a9257f86a96306b94e8c18",
+   "quantisation": "Q4_0",
+   "auxiliary_files": [
+    {
+     "file": "mmproj-gemma-4-31B-it-QAT-BF16.gguf",
+     "bytes": 1200726016,
+     "sha256": "25f056d3264782639e703c877d55cdda764658b1b08f045b533fd1a78cb1902f",
+     "note": "vision projector shipped in the same repository; present on the worker, all requests were text-only"
+    }
+   ],
+   "note": "`lms ls` reports 18851726784 bytes for this model (main file plus projector); the language-model file alone is 17651000768 bytes. Hashes are of the local files on the worker that served the runs. The recorded main file is the one served by Hugging Face revisions 4b1a785bfe61a0d8e07227b82e6ada833067f638 through d44a9a6e08ee2373ca77a94d624e5c83f604f6ac of lmstudio-community/gemma-4-31B-it-QAT-GGUF (verified 2026-10-04 against the public API; see upstream_revision). The file at the earlier revision b0888938 (2026-06-03) differs (17650999360 bytes, sha256 f7cdec93...), and the current head 12e5eae7 (2026-07-20) carries a different file again (17651001280 bytes, sha256 6f63619c...; checked against the public API), so reproducing the Gemma sensitivity cells needs a file matching the hash recorded here, which is obtainable by downloading the file at a revision in that range (for example `huggingface-cli download lmstudio-community/gemma-4-31B-it-QAT-GGUF gemma-4-31B-it-QAT-Q4_0.gguf --revision 4b1a785bfe61a0d8e07227b82e6ada833067f638`). The vision projector recorded above matches the revisions up to a5d3c353; the projector at d44a9a6e and at head is a different file (1200726080 bytes, sha256 8096fab2...). All runs were text-only, so the projector is not used.",
+   "upstream_revision": {
+    "repo": "lmstudio-community/gemma-4-31B-it-QAT-GGUF",
+    "first": "4b1a785bfe61a0d8e07227b82e6ada833067f638",
+    "last": "d44a9a6e08ee2373ca77a94d624e5c83f604f6ac",
+    "meaning": "every Hugging Face revision from `first` through `last` (4b1a785b, 5f1655eb, a5d3c353, d44a9a6e) serves gemma-4-31B-it-QAT-Q4_0.gguf as 17651000768 bytes with LFS sha256 e664c3b4...; checked 2026-10-04 against the public Hugging Face API (tree?expand=true and the x-linked-etag of the resolve URL)",
+    "which_revision_was_downloaded": "not recorded; any revision in the range yields the recorded file"
+   },
+   "licence": "Apache-2.0",
+   "licence_source": "https://ai.google.dev/gemma/docs/gemma_4_license",
+   "licence_note": "Verified 2026-10-05: Gemma 4 is NOT under the Gemma Terms of Use that earlier Gemma generations used (google/gemma-3-27b-it is tagged license gemma). The Hugging Face API for google/gemma-4-31B-it and google/gemma-4-31B-it-qat-q4_0-unquantized (the base_model of the GGUF repository) reports license apache-2.0 with license_link set to the licence_source URL, and that Google developer page is titled 'Apache License 2.0' and contains the Apache License 2.0 text. lmstudio-community/gemma-4-31B-it-QAT-GGUF is tagged apache-2.0 at revision d44a9a6e and at head; its first revision in the recorded range (4b1a785b) carries no license tag."
+  }
+ ]
+}
